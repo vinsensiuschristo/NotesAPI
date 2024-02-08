@@ -24,22 +24,75 @@ app.get('/', (req: express.Request, res: express.Response) => {
 })
 
 app.get('/api/v1/notes', (async (req: express.Request, res: express.Response) => {
+  let notesWithFind
+
+  if (req.query.reading === '1') {
+    notesWithFind = await Notes.find({ reading: true }).select({ _id: 1, name: 1, publisher: 1 })
+
+    return res.status(200).send({
+      status: 'success',
+      data: {
+        books: notesWithFind
+      }
+    })
+  } else if (req.query.reading === '0') {
+    notesWithFind = await Notes.find({ reading: false }).select({ _id: 1, name: 1, publisher: 1 })
+
+    return res.status(200).send({
+      status: 'success',
+      data: {
+        books: notesWithFind
+      }
+    })
+  }
+
+  if (req.query.finished === '1') {
+    notesWithFind = await Notes.find({ finished: true }).select({ _id: 1, name: 1, publisher: 1 })
+
+    return res.status(200).send({
+      status: 'success',
+      data: {
+        books: notesWithFind
+      }
+    })
+  } else if (req.query.finished === '0') {
+    notesWithFind = await Notes.find({ finished: false }).select({ _id: 1, name: 1, publisher: 1 })
+
+    return res.status(200).send({
+      status: 'success',
+      data: {
+        books: notesWithFind
+      }
+    })
+  }
+
+  if (req.query.name) {
+    notesWithFind = await Notes.find({ name: { $regex: req.query.name } }).select({ _id: 1, name: 1, publisher: 1 })
+
+    return res.status(200).send({
+      status: 'success',
+      data: {
+        books: notesWithFind
+      }
+    })
+  }
+
   const notes = await Notes.find().select({ _id: 1, name: 1, publisher: 1 })
 
   if (notes === null) {
-    res.send({
+    res.status(200).send({
       status: 'success',
       data: {
         book: []
       }
     })
   } else {
-    res.send({
+    res.status(200).send({
       status: 'success',
       data: {
         books: notes
       }
-    }).status(200)
+    })
   }
 }) as RequestHandler)
 
@@ -47,30 +100,30 @@ app.get('/api/v1/notes/:notesId', (async (req: express.Request, res: express.Res
   const { notesId } = req.params
 
   if (notesId.length !== 24) {
-    return res.send({
+    return res.status(404).send({
       status: 'fail',
       message: 'Id harus mempunyai panjang 24'
-    }).status(404)
+    })
   }
 
   const notes = await Notes.findById(req.params.notesId).exec()
 
   try {
     if (notes === null) {
-      res.send({
+      res.status(404).send({
         status: 'fail',
         message: 'Buku tidak ditemukan'
-      }).status(404)
+      })
     } else {
-      res.send({
+      res.status(200).send({
         status: 'success',
         data: {
           book: notes
         }
-      }).status(200)
+      })
     }
   } catch (e: any) {
-    res.send({
+    res.status(500).send({
       status: 'fail',
       message: e.message
     }).status(500)
@@ -86,6 +139,14 @@ app.post('/api/v1/notes', (async (req: express.Request, res: express.Response) =
   if (pageCount === readPage) {
     finished = true
   }
+
+  if (readPage > pageCount) {
+    return res.status(400).send({
+      status: 'fail',
+      message: 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount'
+    })
+  }
+
   try {
     const notes = new Notes({
       name,
@@ -103,17 +164,17 @@ app.post('/api/v1/notes', (async (req: express.Request, res: express.Response) =
 
     await notes.save()
 
-    res.send({
+    res.status(201).send({
       status: 'success',
       message: 'Buku berhasil ditambahkan',
       data: {
         bookId: notes._id
       }
-    }).status(201)
+    })
   } catch (err: any) {
-    res.send({
-      message: err.message,
-      error: true
+    res.status(400).send({
+      status: 'fail',
+      message: 'Gagal menambahkan buku. Mohon isi nama buku'
     })
   }
 }) as RequestHandler)
@@ -128,21 +189,28 @@ app.put('/api/v1/notes/:notesId', (async (req: express.Request, res: express.Res
     finished = true
   }
 
+  if (name === null || name === undefined) {
+    return res.status(400).send({
+      status: 'fail',
+      message: 'Gagal memperbarui buku. Mohon isi nama buku'
+    })
+  }
+
   const filter = { _id: notesId }
   const updatedField = { name, year, author, summary, publisher, pageCount, readPage, finished, reading, updatedAt }
 
   if (notesId.length !== 24) {
-    return res.send({
+    return res.status(400).send({
       status: 'fail',
       message: 'Id harus mempunyai panjang 24'
-    }).status(400)
+    })
   }
 
   if (readPage > pageCount) {
-    return res.send({
+    return res.status(400).send({
       status: 'fail',
       message: 'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount'
-    }).status(400)
+    })
   }
 
   try {
@@ -151,18 +219,18 @@ app.put('/api/v1/notes/:notesId', (async (req: express.Request, res: express.Res
     })
 
     if (update === null) {
-      res.send({
+      res.status(404).send({
         status: 'fail',
         message: 'Gagal memperbarui buku. Id tidak ditemukan'
-      }).status(404)
+      })
     } else {
-      res.send({
+      res.status(200).send({
         status: 'success',
         message: 'Buku berhasil diperbaharui'
-      }).status(200)
+      })
     }
   } catch (e: any) {
-    res.send({
+    res.status(500).send({
       status: 'fail',
       message: e.message
     })
@@ -174,7 +242,7 @@ app.delete('/api/v1/notes/:notesId', (async (req: express.Request, res: express.
   const filter = { _id: notesId }
 
   if (notesId.length !== 24) {
-    return res.send({
+    return res.status(400).send({
       status: 'fail',
       message: 'Id harus mempunyai panjang 24'
     })
@@ -184,18 +252,18 @@ app.delete('/api/v1/notes/:notesId', (async (req: express.Request, res: express.
     const deleteNotes = await Notes.findOneAndDelete(filter)
 
     if (deleteNotes === null) {
-      return res.send({
+      return res.status(404).send({
         status: 'fail',
         message: 'Buku gagal dihapus. Id tidak ditemukan'
-      }).status(404)
+      })
     } else {
-      return res.send({
+      return res.status(200).send({
         status: 'success',
         message: 'Buku berhasil dihapus'
-      }).status(200)
+      })
     }
   } catch (e: any) {
-    res.send({
+    res.status(500).send({
       status: 'fail',
       message: e.message
     })
