@@ -24,10 +24,9 @@ app.get('/', (req: express.Request, res: express.Response) => {
 })
 
 app.get('/api/v1/notes', (async (req: express.Request, res: express.Response) => {
-  let notesWithFind
-
+  // IF READING
   if (req.query.reading === '1') {
-    notesWithFind = await Notes.find({ reading: true }).select({ _id: 1, name: 1, publisher: 1 })
+    const notesWithFind = await Notes.find({ reading: true }).select({ _id: 1, name: 1, publisher: 1 })
 
     return res.status(200).send({
       status: 'success',
@@ -36,7 +35,7 @@ app.get('/api/v1/notes', (async (req: express.Request, res: express.Response) =>
       }
     })
   } else if (req.query.reading === '0') {
-    notesWithFind = await Notes.find({ reading: false }).select({ _id: 1, name: 1, publisher: 1 })
+    const notesWithFind = await Notes.find({ reading: false }).select({ _id: 1, name: 1, publisher: 1 })
 
     return res.status(200).send({
       status: 'success',
@@ -46,8 +45,9 @@ app.get('/api/v1/notes', (async (req: express.Request, res: express.Response) =>
     })
   }
 
+  // IF FINISHED
   if (req.query.finished === '1') {
-    notesWithFind = await Notes.find({ finished: true }).select({ _id: 1, name: 1, publisher: 1 })
+    const notesWithFind = await Notes.find({ finished: true }).select({ _id: 1, name: 1, publisher: 1 })
 
     return res.status(200).send({
       status: 'success',
@@ -56,7 +56,7 @@ app.get('/api/v1/notes', (async (req: express.Request, res: express.Response) =>
       }
     })
   } else if (req.query.finished === '0') {
-    notesWithFind = await Notes.find({ finished: false }).select({ _id: 1, name: 1, publisher: 1 })
+    const notesWithFind = await Notes.find({ finished: false }).select({ _id: 1, name: 1, publisher: 1 })
 
     return res.status(200).send({
       status: 'success',
@@ -66,8 +66,10 @@ app.get('/api/v1/notes', (async (req: express.Request, res: express.Response) =>
     })
   }
 
-  if (req.query.name) {
-    notesWithFind = await Notes.find({ name: { $regex: req.query.name } }).select({ _id: 1, name: 1, publisher: 1 })
+  // IF NAME
+  if (typeof req.query.name !== 'undefined') {
+    // console.log('query name undefined')
+    const notesWithFind = await Notes.find({ name: { $regex: req.query.name } }).select({ _id: 1, name: 1, publisher: 1 })
 
     return res.status(200).send({
       status: 'success',
@@ -200,9 +202,9 @@ app.put('/api/v1/notes/:notesId', (async (req: express.Request, res: express.Res
   const updatedField = { name, year, author, summary, publisher, pageCount, readPage, finished, reading, updatedAt }
 
   if (notesId.length !== 24) {
-    return res.status(400).send({
+    return res.status(404).send({
       status: 'fail',
-      message: 'Id harus mempunyai panjang 24'
+      message: 'Id harus lebih dari 24'
     })
   }
 
