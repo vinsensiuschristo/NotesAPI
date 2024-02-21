@@ -27,18 +27,18 @@ $ npm start:js
 ### Create Notes
 
 * Methods : POST
-* URL : /notes
+* URL : /api/v1/notes
 * Body Request : 
 ```JSON
 {
-  "name": string,
-  "year": number,
-  "author": string,
-  "summary": string,
-  "publisher": string,
-  "pageCount": number,
-  "readPage": number,
-  "reading": boolean
+  "name": "string",
+  "year": "number",
+  "author": "string",
+  "summary": "string",
+  "publisher": "string",
+  "pageCount": "number",
+  "readPage": "number",
+  "reading": "boolean"
 }
 ```
 * Response
@@ -100,7 +100,7 @@ Some properties are processed and obtained on the server side. Here is the expla
 ### Get Notes
 
 * Methods : GET
-* URL : /notes
+* URL : /api/v1/notes
 * Response
 ```JSON
 {
@@ -129,7 +129,7 @@ Some properties are processed and obtained on the server side. Here is the expla
 ### Get Detail Notes
 
 * Methods : GET
-* URL : /notes/{noteId}
+* URL : /api/v1/notes/:notesId
 
 #### Success Response
 * Status Code : 200
@@ -169,18 +169,18 @@ Some properties are processed and obtained on the server side. Here is the expla
 ### Update Notes
 
 * Methods : PUT
-* URL : /notes/{noteId}
+* URL : /api/v1/notes/:notesId
 * Body Request :
 ```JSON
 {
-  "name": string,
-  "year": number,
-  "author": string,
-  "summary": string,
-  "publisher": string,
-  "pageCount": number,
-  "readPage": number,
-  "reading": boolean
+  "name": "string",
+  "year": "number",
+  "author": "string",
+  "summary": "string",
+  "publisher": "string",
+  "pageCount": "number",
+  "readPage": "number",
+  "reading": "boolean"
 }
 ```
 #### Error Response
@@ -225,7 +225,7 @@ Some properties are processed and obtained on the server side. Here is the expla
 ### Delete Notes
 
 * Methods : DELETE
-* URL : /notes/{noteId}
+* URL : /api/v1/notes/:notesId
 #### Error Response
 * If the attached id is not owned by any book, then the server should return the following response
     * Status Code : 404
