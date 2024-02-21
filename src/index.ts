@@ -24,12 +24,6 @@ app.get('/', (req: express.Request, res: express.Response) => {
   res.send('Health check ouk')
 })
 
-// app.get('/api/v1/notes', getNotes)
-// app.get('/api/v1/notes/:notesId'
-// app.post('/api/v1/notes'
-// app.put('/api/v1/notes/:notesId'
-// app.delete('/api/v1/notes/:notesId'
-
 app.listen(port, () => {
   console.log(`listening on port ${port}`)
 })
