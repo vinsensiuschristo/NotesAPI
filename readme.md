@@ -12,6 +12,7 @@ A list of technologies used within the project:
 * [Typescript](https://www.typescriptlang.org/): Version 5.3.3
 * [Express](https://expressjs.com/): Version 4.18.2
 * [Mongoose](https://mongoosejs.com/): Version 8.1.1
+* [Zod](https://zod.dev/): Version 3.22.4
 ## Installation
 ***
 A little intro about the installation.
